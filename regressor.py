@@ -7,8 +7,8 @@ rng = numpy.random
 x = tf.placeholder(tf.float32)
 print("X: %s"%(x))
 t = tf.Variable([rng.randn(), rng.randn(), rng.randn()], dtype=tf.float32)
-b = tf.Variable([-.3], dtype=tf.float32)
-linear_model = tf.reduce_sum(tf.add(tf.multiply(x, t), b))
+b = tf.Variable([rng.randn()], dtype=tf.float32)
+linear_model = tf.add(tf.reduce_sum(tf.multiply(x, t)), b)
 y = tf.placeholder(tf.float32)
 
 # loss
@@ -63,9 +63,9 @@ y_train = [
 init = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init) # reset values to wrong
-for i in range(1000):
+for i in range(10000):
   sess.run(train, {x: x_train, y: y_train})
-  if i % 100 == 0:
+  if i % 1000 == 0:
     curr_W, curr_b, curr_loss = sess.run([t, b, loss], {x: x_train, y: y_train})
     print("Theta: %s b: %s loss: %s"%(curr_W, curr_b, curr_loss))
 
