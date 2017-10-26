@@ -1,10 +1,12 @@
 import tensorflow as tf
+import numpy
+rng = numpy.random
 
 # Model parameters
 # Model input and output
 x = tf.placeholder(tf.float32)
 print("X: %s"%(x))
-t = tf.Variable([0.01, 0.01, 0.01], dtype=tf.float32)
+t = tf.Variable([rng.randn(), rng.randn(), rng.randn()], dtype=tf.float32)
 b = tf.Variable([-.3], dtype=tf.float32)
 linear_model = tf.reduce_sum(tf.add(tf.multiply(x, t), b))
 y = tf.placeholder(tf.float32)
