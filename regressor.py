@@ -6,8 +6,8 @@ rng = numpy.random
 # Model input and output
 x = tf.placeholder(tf.float32)
 print("X: %s"%(x))
-t = tf.Variable([rng.randn(), rng.randn(), rng.randn()], dtype=tf.float32)
-b = tf.Variable([rng.randn()], dtype=tf.float32)
+t = tf.Variable([rng.rand(), rng.rand(), rng.rand()], dtype=tf.float32)
+b = tf.Variable([rng.rand()], dtype=tf.float32)
 linear_model = tf.add(tf.reduce_sum(tf.multiply(x, t)), b)
 y = tf.placeholder(tf.float32)
 
@@ -54,7 +54,7 @@ x_train = [ \
 	]
 
 y_train = [
-	0.06, 0.11, 0.16, \
+	0.06, 0.10, 0.16, 0.14, 0.12, 0.08 \
 	# 0.04, 0.10, 0.16, 0.01, 9, 0.16, \
 	# 0.07, 0.15, 0.20, 0.05, 0.14, 0.20, 0.02, 0.13, 0.20, \
 	# 0.12, 0.18, 0.21, 0.08, 0.17, 0.21, 0.3, 0.19, 0.21
