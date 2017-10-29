@@ -24,9 +24,14 @@ y_data = [
 W1 = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
 W2 = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
 W3 = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
+W4 = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
+W5 = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
+W6 = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
 b = tf.Variable(tf.random_uniform([1], -1.0, 1.0))
 
-hypothesis = W1 * x1_data + W2 * x2_data  + W3 * x3_data + b
+hypothesis = W1 * x1_data + W2 * x1_data * x1_data \
+	+ W3 * x2_data + W4 * x2_data * x2_data \
+	+ W5 * x3_data + W6 * x3_data * x3_data + b
 
 cost = tf.reduce_mean(tf.square(hypothesis - y_data))
 
@@ -39,8 +44,10 @@ init = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init)
 
-for step in range(2000):
+for step in range(250000):
     sess.run(train)
-    if step % 250 == 0:
-        curr_W1, curr_W2, curr_W3, curr_b, curr_loss = sess.run([W1, W2, W3, b, cost])
-        print("W1: %s W2: %s W3: %s b: %s loss: %s"%(curr_W1, curr_W2, curr_W3, curr_b, curr_loss))
+    if step % 25000 == 0:
+        curr_W1, curr_W2, curr_W3, curr_W4, curr_W5, curr_W6, curr_b, curr_loss \
+        	= sess.run([W1, W2, W3, W4, W5, W6, b, cost])
+        print("W1: %s W2: %s W3: %s W4: %s W5: %s W6: %s b: %s loss: %s"%(
+        	curr_W1, curr_W2, curr_W3, curr_W4, curr_W5, curr_W6, curr_b, curr_loss))
