@@ -35,8 +35,7 @@ hypothesis = W1 * x1_data + W2 * x1_data * x1_data \
 
 cost = tf.reduce_mean(tf.square(hypothesis - y_data))
 
-a = tf.Variable(0.1)
-optimizer = tf.train.GradientDescentOptimizer(a)
+optimizer = tf.train.MomentumOptimizer(learning_rate=0.1, momentum=0.9)
 train = optimizer.minimize(cost)
 
 init = tf.global_variables_initializer()
@@ -44,9 +43,9 @@ init = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init)
 
-for step in range(250000):
+for step in range(10000):
     sess.run(train)
-    if step % 25000 == 0:
+    if step % 1000 == 0:
         curr_W1, curr_W2, curr_W3, curr_W4, curr_W5, curr_W6, curr_b, curr_loss \
         	= sess.run([W1, W2, W3, W4, W5, W6, b, cost])
         print("W1: %s W2: %s W3: %s W4: %s W5: %s W6: %s b: %s loss: %s"%(
