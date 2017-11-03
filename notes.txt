@@ -23,7 +23,7 @@ I think with some optimizations, Deep Pink could actually play substantially bet
 - Faster evaluation function: It might be possible to train a smaller (but maybe deeper) version of the same neural network
 - Faster evaluation function: I didn’t use the GPU for playing, only for training.
 "
-I don't really understand how a smaller neural network will make the evaluation function faster. :(
+I understand how a smaller neural network will make the evaluation function faster, but I fear it may not perform as well. :(
 
 @2: This is the game:
 
