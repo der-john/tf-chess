@@ -1,0 +1,33 @@
+This is just a notepad for my thoughts on how to improve elc1798/chessley-tan.
+
+
+ISSUES / TOPICS:
+================
+
+0. First, I thought the AI is unbearably bad. (I "mated" in 6 moves.) But then I remembered: It's supposed to be a "baby AI". So that's the idea. To get a better AI (no telling how much better), I used `model.pickle` from erikbern/deep-pink:
+
+1. I increased `max_depth` of the search function to improve performance. But then the playing speed of the AI gets very low. :(
+
+2. Even with `max_depth = 2`, the playing performance of the AI is low. I just played a game against it with `max_depth` set to 2. (It took at least 1 1/2 h.)
+
+3. I'm curently running `train.py` on a `sample.hdf5` file, containing 8889 games. 7 training iterations have taken at least two hours. It's not clear to me whether the cost will decrease on the long run.
+
+
+
+@1: erikbern himself acknowledges this on https://erikbern.com/2014/11/29/deep-learning-for-chess.html :
+"
+I think with some optimizations, Deep Pink could actually play substantially better:
+
+- Better search algorithm. I’m currently using Negamax with alpha-beta pruning, whereas Sunfish uses MTD-f
+- Better evaluation function. Deep Pink plays pretty aggressively, but makes a lot of dumb mistakes. By generating “harder” training examples (ideally fed from mistakes it made) it should learn a better model
+- Faster evaluation function: It might be possible to train a smaller (but maybe deeper) version of the same neural network
+- Faster evaluation function: I didn’t use the GPU for playing, only for training.
+"
+I don't really understand how a smaller neural network will make the evaluation function faster. :(
+
+@2: This is the game:
+
+deep-pink (W) vs der-john (B)
+1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. c3(? ok, gambit...) dxc3 5. Nxc3 d6 6. Bc4 Nf6 7. 0-0 Bg4 8. Bg5 e6 9. Qb3 Rb8 10. Qa4 a6 11. Re1? (This, I'd say is the first real mistake.) b5 12. Bxb5 axb5 13. Nxb5 Qb6 14. e5(?) Qxb5 15. Qxb5 Rxb5 16. exf6 Rxb2 17. Rb1(?) Rxb1 18. Rxb1 h6 19. Be3? gxf6 20. Nd2 d5 21. Rb3 e5 22. Rb8??? Nxb8 23. Nb3 d4 24. Bxd4? exd4 25. Nxd4 Bc5 26. Nb5 Kd7 27. a4 Re8 28. a5??? Re1. 0-1.
+
+The most unsatisfying thing about the AI's performance is that it the deterioration of its game state is not reflected well in the 'score' it prints. Especially move 11 to 22. The score mostly oscillated around 1 or 1.5, only at move 23 does it move below 0 and stay around -0.8. (Immerchin...) :(
