@@ -7,13 +7,13 @@ ISSUES / TOPICS
 REGARDING THE SYSTEM IN static/neural-net/deep-pink/nn:
 =======================================================
 
-0. First, I thought the AI is unbearably bad. (I "mated" in 6 moves.) But then I remembered: It's supposed to be a "baby AI". So that's the idea. To get a better AI (no telling how much better), I used `model.pickle` from erikbern/deep-pink:
+00. First, I thought the AI is unbearably bad. (I "mated" in 6 moves.) But then I remembered: It's supposed to be a "baby AI". So that's the idea. To get a better AI (no telling how much better), I used `model.pickle` from erikbern/deep-pink:
 
-1. I increased `max_depth` of the search function to improve performance. But then the playing speed of the AI gets very low. :(
+01. I increased `max_depth` of the search function to improve performance. But then the playing speed of the AI gets very low. :(
 
-2. Even with `max_depth = 2`, the playing performance of the AI is low. I just played a game against it with `max_depth` set to 2. (It took at least 1 1/2 h.)
+02. Even with `max_depth = 2`, the playing performance of the AI is low. I just played a game against it with `max_depth` set to 2. (It took at least 1 1/2 h.)
 
-[3. I'm curently running `train.py` on a `sample.hdf5` file, containing 8889 games. 7 training iterations have taken at least two hours. It's not clear to me whether the cost will decrease on the long run. --- It did decrease and finish after about 10h. The AI worked and was about as good as described before. :) ]
+[03. I'm curently running `train.py` on a `sample.hdf5` file, containing 8889 games. 7 training iterations have taken at least two hours. It's not clear to me whether the cost will decrease on the long run. --- It did decrease and finish after about 10h. The AI worked and was about as good as described before. :) ]
 
 
 
@@ -43,9 +43,9 @@ This is `train_function.py`, line 17 and the following:
         feed_dict = dict(zip(names, inputs))
     	updated = self.session.run(self.outputs + self.updates, feed_dict=feed_dict)
 '''
-tensorflow is complaining about the shape of `inputs`, which is part of `feed_dict`. It's supposed to have a higher rank. This is actually the same kind of problem I got when doing Linear Regression with tf for the first time!
+tensorflow is complaining about the shape of `inputs`, which is part of `feed_dict`. It's supposed to have a higher rank. This is actually the same kind of problem I got when doing Linear Regression with tf for the first time! One odd thing is: `trainer.py` successfully(?) calls `train_function.py`. Its value for inputs seems to have the exact same shape as the value that `game.py` has, i.e. (?, 64).
 
-One odd thing is: `trainer.py` successfully(?) calls `train_function.py`. Its value for inputs seems to have the exact same shape as the value that `game.py` has, i.e. (?, 64).
+[Added 2016-11-14: I just had to replace static/neural-net/train.py, line 67, with `scores = func([X])`.]
 
 4. Is it easier writing everything from scratch after all? (It's probably more fun.)
 
