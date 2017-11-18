@@ -22,7 +22,7 @@ def rnd_array(m,n):
 def dsig(a):
     return (1-a)*a
 
-n_inputs = 64*12  # 'deep-pink setup'
+n_inputs = 64*12  # 'half-deep-pink setup'
 n_hidden1 = 1024
 n_hidden2 = 1024
 n_outputs = 1
@@ -251,6 +251,7 @@ def train():
                 Xp_batch = Xp_train[lo:hi]
                 layers, loss = calc_and_update(sess, Xc_batch, Xr_batch, Xp_batch, layers, learning_rate)
                 print("Iteration ", iteration, " Training Loss: ", loss)
+                break
 
             if epoch % 10 == 0:
                 batch_index = random.randint(0, int(len(Xc_test) / batch_size) - 1)
