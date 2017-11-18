@@ -265,15 +265,9 @@ def train():
                 min_test_loss = loss_t
 
                 print("Dumping upgraded model")
-                h1, h2, o = layers
-                h1_w, h1_b = h1
-                h2_w, h2_b = h2
-                o_w, o_b = o
-                param_set = np.array([h1_w.flatten(), h2_w.flatten(), o_w.flatten(), h1_b.flatten(), h2_b.flatten(), o_b.flatten()]).flatten()
-
-                newfilename = 'model_tfc_' + strftime("%Y-%m-%d %H:%M:%S", gmtime())
+                newfilename = 'model.tfc'
                 fout = open(newfilename, 'wb')
-                pickle.dump(param_set, fout)
+                pickle.dump(layers, fout)
                 fout.close()
 
 if __name__ == '__main__':
