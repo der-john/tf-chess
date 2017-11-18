@@ -27,6 +27,10 @@ I've checked the values of the function call: They are `[None, None, None, None,
 
 I'm fairly sure tensorflow can't calculate the gradients because the dependence of `loss` on `params` is "buried under too much code" and/or is not usual. (cf. https://stackoverflow.com/questions/43604608/why-is-my-tf-gradients-returning-none/43604747)
 
-The initimidating thing is: calculating the gradients without this helper seems a little tough. One possible point of reference for this is here:
+What do I think is so unusual about our problem? I totally overlooked this fact at first. The loss = cost function depends on running the NN with three different input sets (X_child, X_rand, X_parent). I thought about "simplifying" this fact, by simply giving all layers another dimension with three entries, or multiplying the inputs by three. But that would be a totally different problem for the NN to solve. :(
+
+So, as opposed to all other NN setups I've seen so far, we need to compute the outputs of one NN for three different input sets, then calculate the gradients for each weight and bias parameter using all of those, and then update the network. Really, even now, I'm not exactly sure what the calculation steps are!
+
+One initimidating thing is: calculating the gradients without this helper seems a little tough. One possible point of reference for this is here:
 
 - https://www.coursera.org/learn/machine-learning/lecture/1z9WW/backpropagation-algorithm
