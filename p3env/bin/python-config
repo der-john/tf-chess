@@ -1,4 +1,4 @@
-#!/home/schmidi/tf-ml/bin/python
+#!/home/schmidi/tf-ml/tf-chess/p3env/bin/python
 
 import sys
 import getopt

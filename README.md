@@ -6,12 +6,12 @@ A very simple Chess AI Generator based on https://github.com/erikbern/deep-pink,
 But for now, speed and accuracy are tough challenges... Feel free to point out any improvements.
 
 In order to play against an AI, do the following:
-- `source bin/activate`
+- `source p3env/bin/activate`
 - `cd netz`
 - `python play.py`
 
 In order to train a model on existing `.hdf5` files:
-- `source bin/activate`
+- `source p3env/bin/activate`
 - `cd netz`
 - `python trainer.py`
 
