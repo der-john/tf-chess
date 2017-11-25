@@ -62,9 +62,11 @@ target/
 .*.swp
 
 # Python Virtual Env
-chessley-venv/
+p3env/
+p2bin/
 
 # .pgn and .hdf5 game data files
+netz/game-repo/
 *.pgn
 
 *.chessley
