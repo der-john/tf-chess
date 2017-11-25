@@ -15,8 +15,8 @@ import time
 def convert_board(raw_board):
     # Convert input into a 12 * 64 list
     conv_board = []
-    raw_board.flatten()
-    for sq in raw_board:
+    flattened_board = raw_board.flatten()
+    for sq in flattened_board:
         for piece in [1,2,3,4,5,6, 8,9,10,11,12,13]:
             conv_board.append(np.float64(sq == piece))
     return conv_board
@@ -33,25 +33,19 @@ def load_data(dir='game-files/'):
             print('could not read', fn)
 
 def get_data(series=['x', 'xr', 'xp']):
+    print("getting data...")
     data = [[] for s in series]
     for f in load_data():
+        print("loading", f)
         try:
             for i, s in enumerate(series):
-                converted_board = convert_board(f[s].value)
-                data[i].append(converted_board)
+                for raw_board in f[s].value:
+                    converted_board = convert_board(raw_board)
+                    data[i].append(converted_board)
         except:
             raise
             print('failed reading from', f)
-
-    def stack(vectors):
-        if len(vectors[0].shape) > 1:
-            return np.vstack(vectors)
-        else:
-            return np.hstack(vectors)
-
-    data = [stack(d) for d in data]
-
-    data = convert_boards(data)
+    print("done getting data")
 
     test_size = len(data[0]) // 5
     print('Splitting', len(data[0]), 'entries into train/test set')
@@ -61,11 +55,13 @@ def get_data(series=['x', 'xr', 'xp']):
 
     return data
 
-def train(training_op, loss):
+def train(training_op, loss, X):
     Xc_train, Xc_test, Xr_train, Xr_test, Xp_train, Xp_test = get_data()
 
     n_epochs = 40
     batch_size = 50
+    init = tf.global_variables_initializer()
+
     with tf.Session() as sess:
         init.run()
         for epoch in range(n_epochs):
@@ -121,10 +117,7 @@ def main():
         optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
         training_op = optimizer.minimize(loss)
 
-    init = tf.global_variables_initializer()
-    saver = tf.train.Saver()
-
-    train(training_op, loss)
+    train(training_op, loss, X)
 
 if __name__ == '__main__':
     main()
