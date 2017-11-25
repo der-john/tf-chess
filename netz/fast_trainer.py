@@ -11,23 +11,15 @@ import h5py
 import math
 import time
 
-MINIBATCH_SIZE = 2000
 
-def convert_boards(series):
-    out = []
-    for subseries in series:
-
-        vectors = []
-        for board in subseries:
-            # Convert input into a 12 * 64 list
-            board.flatten()
-            V = []
-            for sq in board:
-                for piece in [1,2,3,4,5,6, 8,9,10,11,12,13]:
-                    V.append(np.float64(sq == piece))
-            vectors.append(V)
-        out.append(vectors)
-    return out
+def convert_board(raw_board):
+    # Convert input into a 12 * 64 list
+    conv_board = []
+    raw_board.flatten()
+    for sq in raw_board:
+        for piece in [1,2,3,4,5,6, 8,9,10,11,12,13]:
+            conv_board.append(np.float64(sq == piece))
+    return conv_board
 
 def load_data(dir='game-files/'):
     for fn in os.listdir(dir):
@@ -45,7 +37,8 @@ def get_data(series=['x', 'xr', 'xp']):
     for f in load_data():
         try:
             for i, s in enumerate(series):
-                data[i].append(f[s].value)
+                converted_board = convert_board(f[s].value)
+                data[i].append(converted_board)
         except:
             raise
             print('failed reading from', f)
@@ -60,7 +53,7 @@ def get_data(series=['x', 'xr', 'xp']):
 
     data = convert_boards(data)
 
-    test_size = int(len(data[0]) / 5)
+    test_size = len(data[0]) // 5
     print('Splitting', len(data[0]), 'entries into train/test set')
     data = train_test_split(*data, test_size=test_size)
 
@@ -68,19 +61,16 @@ def get_data(series=['x', 'xr', 'xp']):
 
     return data
 
-
 def train(training_op, loss):
     Xc_train, Xc_test, Xr_train, Xr_test, Xp_train, Xp_test = get_data()
 
-    n_epochs = 1
+    n_epochs = 40
     batch_size = 50
-    init = tf.global_variables_initializer()
-
     with tf.Session() as sess:
         init.run()
         for epoch in range(n_epochs):
             for iteration in range(len(Xc_train) // batch_size):
-                batch_index = random.randint(0, int(len(Xc_train) / batch_size) - 1)
+                batch_index = random.randint(0, len(Xc_train) // batch_size - 1)
                 lo, hi = batch_index * batch_size, (batch_index + 1) * batch_size
                 X_batch = np.array([Xc_train[lo:hi], Xp_train[lo:hi], Xr_train[lo:hi]])
                 sess.run(training_op, feed_dict={X: X_batch})
@@ -95,10 +85,11 @@ def train(training_op, loss):
         weights = [v.eval(session=sess) for v in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if v.name.endswith('weights:0')]
         biases = [v.eval(session=sess) for v in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if v.name.endswith('biases:0')]
         fout = open('model.tfc', 'wb')
-        pickle.dump((values(get_weights()), values(get_biases())), fout)
+        pickle.dump((weights, biases), fout)
         fout.close()
 
 def main():
+    # The following NN contains ? units.
     n_inputs = 64*12
     n_hidden1 = 4096
     n_hidden2 = 2048
@@ -129,6 +120,9 @@ def main():
     with tf.name_scope("train"):
         optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
         training_op = optimizer.minimize(loss)
+
+    init = tf.global_variables_initializer()
+    saver = tf.train.Saver()
 
     train(training_op, loss)
 
