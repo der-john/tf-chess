@@ -2,7 +2,7 @@
 import numpy as np
 import os
 import tensorflow as tf
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 import pickle
 import random
 import itertools
@@ -68,46 +68,13 @@ def get_data(series=['x', 'xr', 'xp']):
 
     return data
 
-# The following NN contains ? units.
-n_inputs = 64*12
-n_hidden1 = 4096
-n_hidden2 = 2048
-n_hidden3 = 1024
-n_outputs = 1
 
-X = tf.placeholder(tf.float32, shape=(3, None, n_inputs), name="X")
-
-with tf.name_scope("dnn"):
-    hidden1 = tf.layers.dense(X, n_hidden1, name="hidden1",
-                              activation=tf.nn.relu)
-    hidden2 = tf.layers.dense(hidden1, n_hidden2, name="hidden2",
-                              activation=tf.nn.relu)
-    hidden3 = tf.layers.dense(hidden2, n_hidden3, name="hidden3",
-                              activation=tf.nn.relu)
-    out = tf.layers.dense(hidden3, n_outputs, name="outputs")
-
-with tf.name_scope("loss"):
-    kappa = 10
-    fXc = out[0]
-    fXr = out[1]
-    fXp = out[2]
-    loss = tf.reduce_mean(-tf.log(tf.sigmoid(fXc - fXr)) - kappa * tf.log(tf.sigmoid(fXc + fXp)) - kappa * tf.log(tf.sigmoid(-fXc - fXp)))
-
-learning_rate = 0.3
-momentum = 0.9
-
-with tf.name_scope("train"):
-    optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
-    training_op = optimizer.minimize(loss)
-
-init = tf.global_variables_initializer()
-saver = tf.train.Saver()
-
-n_epochs = 40
-batch_size = 50
-
-def train():
+def train(training_op, loss):
     Xc_train, Xc_test, Xr_train, Xr_test, Xp_train, Xp_test = get_data()
+
+    n_epochs = 1
+    batch_size = 50
+    init = tf.global_variables_initializer()
 
     with tf.Session() as sess:
         init.run()
@@ -125,16 +92,45 @@ def train():
             print("Epoch: ", epoch, " Test Loss: ", test_cost)
 
         print("Dumping the model")
-        def get_weights():
-            return [v for v in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if v.name.endswith('weights:0')]
-        def get_biases():
-            return [v for v in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if v.name.endswith('biases:0')]
-        def values(set_x):
-            return [x.eval(session=sess) for x in set_x]
+        weights = [v.eval(session=sess) for v in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if v.name.endswith('weights:0')]
+        biases = [v.eval(session=sess) for v in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if v.name.endswith('biases:0')]
         fout = open('model.tfc', 'wb')
         pickle.dump((values(get_weights()), values(get_biases())), fout)
         fout.close()
 
+def main():
+    n_inputs = 64*12
+    n_hidden1 = 4096
+    n_hidden2 = 2048
+    n_hidden3 = 1024
+    n_outputs = 1
+
+    X = tf.placeholder(tf.float32, shape=(3, None, n_inputs), name="X")
+
+    with tf.name_scope("dnn"):
+        hidden1 = tf.layers.dense(X, n_hidden1, name="hidden1",
+                                  activation=tf.nn.relu)
+        hidden2 = tf.layers.dense(hidden1, n_hidden2, name="hidden2",
+                                  activation=tf.nn.relu)
+        hidden3 = tf.layers.dense(hidden2, n_hidden3, name="hidden3",
+                                  activation=tf.nn.relu)
+        out = tf.layers.dense(hidden3, n_outputs, name="outputs")
+
+    with tf.name_scope("loss"):
+        kappa = 10
+        fXc = out[0]
+        fXr = out[1]
+        fXp = out[2]
+        loss = tf.reduce_mean(-tf.log(tf.sigmoid(fXc - fXr)) - kappa * tf.log(tf.sigmoid(fXc + fXp)) - kappa * tf.log(tf.sigmoid(-fXc - fXp)))
+
+    learning_rate = 0.3
+    momentum = 0.9
+
+    with tf.name_scope("train"):
+        optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
+        training_op = optimizer.minimize(loss)
+
+    train(training_op, loss)
 
 if __name__ == '__main__':
-    train()
+    main()
