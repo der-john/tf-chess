@@ -95,12 +95,9 @@ def main():
     X = tf.placeholder(tf.float32, shape=(3, None, n_inputs), name="X")
 
     with tf.name_scope("dnn"):
-        hidden1 = tf.layers.dense(X, n_hidden1, name="hidden1",
-                                  activation=tf.nn.relu)
-        hidden2 = tf.layers.dense(hidden1, n_hidden2, name="hidden2",
-                                  activation=tf.nn.relu)
-        hidden3 = tf.layers.dense(hidden2, n_hidden3, name="hidden3",
-                                  activation=tf.nn.relu)
+        hidden1 = tf.layers.dense(X, n_hidden1, name="hidden1", activation=tf.nn.relu)
+        hidden2 = tf.layers.dense(hidden1, n_hidden2, name="hidden2", activation=tf.nn.relu)
+        hidden3 = tf.layers.dense(hidden2, n_hidden3, name="hidden3", activation=tf.nn.relu)
         out = tf.layers.dense(hidden3, n_outputs, name="outputs")
 
     with tf.name_scope("loss"):
@@ -110,7 +107,7 @@ def main():
         fXp = out[2]
         loss = tf.reduce_mean(-tf.log(tf.sigmoid(fXc - fXr)) - kappa * tf.log(tf.sigmoid(fXc + fXp)) - kappa * tf.log(tf.sigmoid(-fXc - fXp)))
 
-    learning_rate = 0.3
+    learning_rate = 0.03
     momentum = 0.9
 
     with tf.name_scope("train"):
