@@ -63,10 +63,14 @@ target/
 
 # Python Virtual Env
 chessley-venv/
+p2bin/
+p3env/
 
-# .pgn and .hdf5 game data files
+# .pgn game data files and .hdf5 in the repo
 *.pgn
+netz/game-repo
 
+# pickeled models
 *.chessley
 *.pickle
 
