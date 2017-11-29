@@ -11,61 +11,11 @@ import string
 import numpy as np
 import random
 import traceback
-
-n_inputs = 64*12  # 'half-deep-pink setup'
-n_hidden1 = 1024
-n_hidden2 = 1024
-n_outputs = 1
-
-X = tf.placeholder(tf.float64, shape=(None, n_inputs), name="X")
-
-def dnn_layer(input_tensor, n_input_units, n_output_units, name, weights, biases, activation_fn=None):
-    with tf.variable_scope(name):
-        input_tensor = tf.cast(input_tensor, dtype=tf.float64)
-        weights = tf.cast(weights, dtype=tf.float64)
-        biases = tf.cast(biases, dtype=tf.float64)
-        act = tf.matmul(input_tensor, weights) + biases
-        if activation_fn is not None:
-            act = activation_fn(act)
-    return act
+from nn import *
 
 def get_model_from_pickle(fn):
     f = open(fn, mode='rb')
-    layers = pickle.load(f)
-    h1, h2, o = layers
-    h1_w, h1_b = h1
-    h2_w, h2_b = h2
-    o_w, o_b = o
-
-    with tf.name_scope("dnn"):
-        hidden1 = dnn_layer(input_tensor=X, 
-                       n_input_units=n_inputs, 
-                       n_output_units=n_hidden1, 
-                       name='hidden1',
-                       weights=h1_w, 
-                       biases=h1_b,
-                       activation_fn=tf.nn.relu)
-        hidden2 = dnn_layer(input_tensor=hidden1, 
-                       n_input_units=n_hidden1, 
-                       n_output_units=n_hidden2, 
-                       name='hidden2',
-                       weights=h2_w, 
-                       biases=h2_b,
-                       activation_fn=tf.nn.relu)
-        out = dnn_layer(input_tensor=hidden2, 
-                       n_input_units=n_hidden2, 
-                       n_output_units=n_outputs, 
-                       name='outputs',
-                       weights=o_w, 
-                       biases=o_b)
-
-    return hidden1, hidden2, out
-
-net = get_model_from_pickle('model.tfc')
-hidden1, hidden2, out = net
-
-strip_whitespace = re.compile(r"\s+")
-translate_pieces = str.maketrans(".pnbrqkPNBRQK", "\x00" + "\x01\x02\x03\x04\x05\x06" + "\x08\x09\x0a\x0b\x0c\x0d")
+    return pickle.load(f, encoding='latin1')
 
 def convert_board(board):
     A = []
@@ -76,6 +26,9 @@ def convert_board(board):
 
 def sf2array(pos, flip):
     # Create a numpy array from a sunfish representation
+    strip_whitespace = re.compile(r"\s+")
+    translate_pieces = str.maketrans(".pnbrqkPNBRQK", "\x00" + "\x01\x02\x03\x04\x05\x06" + "\x08\x09\x0a\x0b\x0c\x0d")
+
     pos = strip_whitespace.sub('', pos.board) # should be 64 characters now
     pos = pos.translate(translate_pieces)
     m = np.fromstring(pos, dtype=np.int8)
@@ -85,7 +38,7 @@ def sf2array(pos, flip):
 
 CHECKMATE_SCORE = 1e6
 
-def negamax(sess, pos, depth, alpha, beta, color, count):
+def negamax(sess, w, b, pos, depth, alpha, beta, color, count):
     moves = []
     boards = []
     pos_children = []
@@ -95,12 +48,13 @@ def negamax(sess, pos, depth, alpha, beta, color, count):
         boards.append(sf2array(pos_child, flip=(color==1)))
         pos_children.append(pos_child)
 
-
     if len(boards) == 0:
-        return Exception('eh?')
+        return Exception('no moves were generated.')
 
+    #print(np.shape(boards))
+    #input("Isn't this a board vector?")
     # Use model to predict scores
-    _, _, scores = sess.run([hidden1, hidden2, out], feed_dict={X: boards})
+    scores = use_nn_for_play(sess, w, b, boards)
 
     for i, pos_child in enumerate(pos_children):
         if pos_child.board.find('K') == -1:
@@ -120,7 +74,7 @@ def negamax(sess, pos, depth, alpha, beta, color, count):
         else:
             # print 'ok will recurse', sunfish.render(move[0]) + sunfish.render(move[1])
             pos_child = pos.move(move)
-            neg_value, _, count_t = negamax(sess, pos_child, depth-1, -beta, -alpha, -color, count)
+            neg_value, _, count_t = negamax(sess, w, b, pos_child, depth-1, -beta, -alpha, -color, count)
             value = -neg_value
         count2 = count2 + count_t
 
@@ -141,7 +95,7 @@ def create_move(board, crdn):
     # workaround for pawn promotions
     move = chess.Move.from_uci(crdn)
     if board.piece_at(move.from_square).piece_type == chess.PAWN:
-        if int(move.to_square/8) in [0, 7]:
+        if move.to_square // 8 in [0, 7]:
             move.promotion = chess.QUEEN # always promote to queen
     return move
 
@@ -155,6 +109,9 @@ class Computer(Player):
     def __init__(self, maxd=5):
         self._pos = sunfish.Position(sunfish.initial, 0, (True,True), (True,True), 0, 0)
         self._maxd = maxd
+        weights, biases = get_model_from_pickle('model.tfc')
+        self._weights = weights
+        self._biases = biases
 
     def move(self, sess, gn_current):
         assert(gn_current.board().turn == True)
@@ -171,7 +128,7 @@ class Computer(Player):
 
         depth = self._maxd
         t0 = time.time()
-        best_value, best_move, count = negamax(sess, self._pos, depth, alpha, beta, 1, 0)
+        best_value, best_move, count = negamax(sess, self._weights, self._biases, self._pos, depth, alpha, beta, 1, 0)
         crdn = sunfish.render(best_move[0]) + sunfish.render(best_move[1])
         print(depth, best_value, crdn, time.time() - t0, count)
 
@@ -182,7 +139,6 @@ class Computer(Player):
         gn_new = chess.pgn.GameNode()
         gn_new.parent = gn_current
         gn_new.move = move
-
 
         return gn_new
 
