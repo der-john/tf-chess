@@ -1,3 +1,6 @@
+# I keep this file here for documenting some earlier work of mine.
+# I don't use it anymore, because its calculations are SO much slower than `fast_trainer.py`.
+
 # Common imports
 import numpy as np
 import os
