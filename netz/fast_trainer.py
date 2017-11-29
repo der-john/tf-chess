@@ -78,8 +78,8 @@ def train(training_op, loss, X):
             print("Epoch: ", epoch, " Test Loss: ", test_cost)
 
         print("Dumping the model")
-        weights = [v.eval(session=sess) for v in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if v.name.endswith('weights:0')]
-        biases = [v.eval(session=sess) for v in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if v.name.endswith('biases:0')]
+        weights = [v.eval(session=sess) for v in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if v.name.endswith('kernel:0')]
+        biases = [v.eval(session=sess) for v in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if v.name.endswith('bias:0')]
         fout = open('model.tfc', 'wb')
         pickle.dump((weights, biases), fout)
         fout.close()
