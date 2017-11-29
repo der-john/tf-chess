@@ -10,7 +10,7 @@ import scipy.sparse
 import h5py
 import math
 import time
-
+from nn import *
 
 def convert_board(raw_board):
     # Convert input into a 12 * 64 list
@@ -85,35 +85,7 @@ def train(training_op, loss, X):
         fout.close()
 
 def main():
-    # The following NN contains ? units.
-    n_inputs = 64*12
-    n_hidden1 = 4096
-    n_hidden2 = 2048
-    n_hidden3 = 1024
-    n_outputs = 1
-
-    X = tf.placeholder(tf.float32, shape=(3, None, n_inputs), name="X")
-
-    with tf.name_scope("dnn"):
-        hidden1 = tf.layers.dense(X, n_hidden1, name="hidden1", activation=tf.nn.relu)
-        hidden2 = tf.layers.dense(hidden1, n_hidden2, name="hidden2", activation=tf.nn.relu)
-        hidden3 = tf.layers.dense(hidden2, n_hidden3, name="hidden3", activation=tf.nn.relu)
-        out = tf.layers.dense(hidden3, n_outputs, name="outputs")
-
-    with tf.name_scope("loss"):
-        kappa = 10
-        fXc = out[0]
-        fXr = out[1]
-        fXp = out[2]
-        loss = tf.reduce_mean(-tf.log(tf.sigmoid(fXc - fXr)) - kappa * tf.log(tf.sigmoid(fXc + fXp)) - kappa * tf.log(tf.sigmoid(-fXc - fXp)))
-
-    learning_rate = 0.03
-    momentum = 0.9
-
-    with tf.name_scope("train"):
-        optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
-        training_op = optimizer.minimize(loss)
-
+    training_op, loss, X = get_nn_for_training()
     train(training_op, loss, X)
 
 if __name__ == '__main__':
