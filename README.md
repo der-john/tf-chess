@@ -24,7 +24,6 @@ In order to create appropriate `.hdf5` files:
 - `python parse_games.py`
 
 To do:
-[ ] Make `parse_games.py` use python3.
 [ ] Make `play` really stop after checkmate.
 [ ] Add pretty frontend ?
 [ ] Save model in checkpoints.

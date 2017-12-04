@@ -27,7 +27,7 @@ def read_games(fn):
 def bb2array(b, flip=False):
     x = numpy.zeros(64, dtype=numpy.int8)
     
-    for pos in xrange(64):
+    for pos in range(64):
         curr_piece = b.piece_at(pos)
         if curr_piece is None:
             continue
@@ -53,7 +53,7 @@ def parse_game(g):
     if r not in rm:
         return None
     y = rm[r]
-    # print >> sys.stderr, 'result:', y
+    # print(sys.stderr, 'result:', y)
 
     # Generate all boards
     gn = g.end()
@@ -67,9 +67,9 @@ def parse_game(g):
         gn = gn.parent
         moves_left += 1
 
-    print len(gns)
+    print(len(gns))
     if len(gns) < 10:
-        print g.end()
+        print(g.end())
 
     gns.pop()
 
@@ -89,15 +89,11 @@ def parse_game(g):
     x_random = bb2array(b_parent, flip=flip)
 
     if moves_left < 3:
-        print moves_left, 'moves left'
-        print 'winner:', y
-        print g.headers
-        print b
-        print 'checkmate:', g.end().board().is_checkmate()
-    
-    # print x
-    # print x_parent
-    # print x_random
+        print(moves_left, 'moves left')
+        print('winner:', y)
+        print(g.headers)
+        print(b)
+        print('checkmate:', g.end().board().is_checkmate())
 
     return (x, x_parent, x_random, moves_left, y)
 
@@ -117,7 +113,7 @@ def read_all_games(fn_in, fn_out):
         if line + 1 >= size:
             g.flush()
             size = 2 * size + 1
-            print 'resizing to', size
+            print('resizing to', size)
             [d.resize(size=size, axis=0) for d in (X, Xr, Xp, Y, M)]
 
         X[line] = x
