@@ -126,19 +126,8 @@ def read_all_games(fn_in, fn_out):
     g.close()
 
 
-def parse_dir():
-    files = []
-    d = 'game-files/'
-    for fn_in in os.listdir(d):
-        if not fn_in.endswith('.pgn'):
-            continue
-        fn_in = os.path.join(d, fn_in)
-        fn_out = fn_in.replace('.pgn', '.hdf5')
-        if not os.path.exists(fn_out):
-            files.append((fn_in, fn_out))
-    for tup in files:
-        read_all_games(tup[0], tup[1])
-
-
 if __name__ == '__main__':
-    parse_dir()
+    d = 'game-files/'
+    fn_in = sys.argv[1]
+    fn_out = fn_in.replace('.pgn', '.hdf5')
+    read_all_games(fn_in, fn_out)
