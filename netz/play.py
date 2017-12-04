@@ -1,21 +1,21 @@
 import pickle
 import tensorflow as tf
-import math
 import os
 import chess, chess.pgn
 import sunfish
-import heapq
 import time
 import re
-import string
 import numpy as np
-import random
 import traceback
 from nn import *
+
+CHECKMATE_SCORE = 1e6
+
 
 def get_model_from_pickle(fn):
     f = open(fn, mode='rb')
     return pickle.load(f, encoding='latin1')
+
 
 def convert_board(board):
     A = []
@@ -23,6 +23,7 @@ def convert_board(board):
         for piece in [1,2,3,4,5,6, 8,9,10,11,12,13]:
             A.append(np.float64(sq == piece))
     return np.array(A)
+
 
 def sf2array(pos, flip):
     # Create a numpy array from a sunfish representation
@@ -36,7 +37,6 @@ def sf2array(pos, flip):
         m = np.fliplr(m.reshape(8, 8)).reshape(64)
     return convert_board(m)
 
-CHECKMATE_SCORE = 1e6
 
 def negamax(sess, w, b, pos, depth, alpha, beta, color, count):
     moves = []
@@ -142,6 +142,7 @@ class Computer(Player):
 
         return gn_new
 
+
 class Human(Player):
     def move(self, sess, gn_current):
         bb = gn_current.board()
@@ -176,6 +177,7 @@ class Human(Player):
         return gn_new
 
 init = tf.global_variables_initializer()
+
 
 def game():
     gn_current = chess.pgn.Game()
@@ -215,11 +217,12 @@ def game():
                     # Both AI's suck at checkmating, so also detect capturing the king
                     return side, times, True
 
-def play():
 
+def play():
     break_please = False
     while not break_please:
         side, times, break_please = game()
+
 
 if __name__ == '__main__':
     play()

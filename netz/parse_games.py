@@ -1,11 +1,9 @@
 import chess, chess.pgn
 import numpy
 import sys
-import os
-import multiprocessing
-import itertools
 import random
 import h5py
+
 
 def read_games(fn):
     f = open(fn)
@@ -20,13 +18,13 @@ def read_games(fn):
 
         if not g:
             break
-        
+
         yield g
 
 
 def bb2array(b, flip=False):
     x = numpy.zeros(64, dtype=numpy.int8)
-    
+
     for pos in range(64):
         curr_piece = b.piece_at(pos)
         if curr_piece is None:
@@ -127,6 +125,7 @@ def read_all_games(fn_in, fn_out):
     [d.resize(size=line, axis=0) for d in (X, Xr, Xp, Y, M)]
     g.close()
 
+
 def parse_dir():
     files = []
     d = 'game-files/'
@@ -139,6 +138,7 @@ def parse_dir():
             files.append((fn_in, fn_out))
     for tup in files:
         read_all_games(tup[0], tup[1])
+
 
 if __name__ == '__main__':
     parse_dir()
