@@ -7,6 +7,7 @@ def get_nn_for_training():
     n_hidden3 = 1024
     n_outputs = 1
 
+    beta = 0.01
     X = tf.placeholder(tf.float32, shape=(3, None, n_inputs), name="X")
 
     with tf.name_scope("dnn"):
@@ -21,13 +22,16 @@ def get_nn_for_training():
         fXr = out[1]
         fXp = out[2]
         loss = tf.reduce_mean(-tf.log(tf.sigmoid(fXc - fXr)) - kappa * tf.log(tf.sigmoid(fXc + fXp)) - kappa * tf.log(tf.sigmoid(-fXc - fXp)))
+        trvars = tf.trainable_variables()
+        reg_loss = tf.add_n([ tf.nn.l2_loss(v) for v in trvars if 'bias:0' not in v.name ]) * beta
+        lossL2 = tf.reduce_mean(loss + reg_loss)
 
     learning_rate = 0.03
     momentum = 0.9
 
     with tf.name_scope("train"):
         optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
-        training_op = optimizer.minimize(loss)
+        training_op = optimizer.minimize(lossL2)
 
     return training_op, loss, X
 
