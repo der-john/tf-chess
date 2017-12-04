@@ -199,26 +199,27 @@ def game():
                     return
                 except:
                     traceback.print_exc()
-                    return side + '-exception', times
+                    return side + '-exception', times, True
 
                 times[side] += time.time() - t0
                 print('=========== Player ', side, ': ', gn_current.move)
                 s = str(gn_current.board())
                 print(s, "\n")
                 if gn_current.board().is_checkmate():
-                    return side, times
+                    return side, times, False
                 elif gn_current.board().is_stalemate():
-                    return '-', times
+                    return '-', times, False
                 elif gn_current.board().can_claim_fifty_moves():
-                    return '-', times
+                    return '-', times, False
                 elif s.find('K') == -1 or s.find('k') == -1:
                     # Both AI's suck at checkmating, so also detect capturing the king
-                    return side, times
+                    return side, times, True
 
 def play():
 
-    while True:
-        side, times = game()
+    break_please = False
+    while not break_please:
+        side, times, break_please = game()
 
 if __name__ == '__main__':
     play()
