@@ -147,8 +147,6 @@ class Human(Player):
     def move(self, sess, gn_current):
         bb = gn_current.board()
 
-        print(bb)
-
         def get_move(move_str):
             try:
                 move = chess.Move.from_uci(move_str)
