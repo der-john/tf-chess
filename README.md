@@ -24,5 +24,5 @@ In order to create appropriate `.hdf5` files:
 - `python parse_games.py`
 
 To do:
-[ ] Add pretty frontend ?
-[ ] Save model in checkpoints.
+- [ ] Add pretty frontend ?
+- [ ] Save model in checkpoints ?
