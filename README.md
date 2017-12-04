@@ -5,7 +5,7 @@ A very simple Chess AI Generator based on https://github.com/erikbern/deep-pink 
 
 But for now, speed and accuracy are tough challenges... Feel free to point out any improvements.
 
-In order to play against my AI, do the following:
+In order to play against the AI, do the following:
 - Create and activate a `venv` with python3.
 - Install the modules in `requirements.txt` with `pip`.
 - `cd netz`
@@ -19,7 +19,7 @@ In order to train a model on existing `.hdf5` files:
 
 In order to create appropriate `.hdf5` files:
 - Download `.pgn` files from `http://www.ficsgames.org/download.html` and save them in `netz/game-files`.
-- `source p2bin/activate`
+- Create and activate a `venv` with python3.
 - `cd netz`
 - `python parse_games.py`
 
