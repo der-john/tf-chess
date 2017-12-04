@@ -181,7 +181,7 @@ def game():
     gn_current = chess.pgn.Game()
     print(gn_current.board().turn)
 
-    maxd = 3 # max depth
+    maxd = 1 # max depth
 
     player_a = Computer(maxd=maxd)
     player_b = Human()
