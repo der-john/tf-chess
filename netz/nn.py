@@ -7,14 +7,19 @@ def get_nn_for_training():
     n_hidden3 = 2048
     n_outputs = 1
 
+    keep_prob = 0.5
     beta = 0.001
     X = tf.placeholder(tf.float32, shape=(3, None, n_inputs), name="X")
 
     with tf.name_scope("dnn"):
-        hidden1 = tf.layers.dense(X, n_hidden1, name="hidden1", activation=tf.nn.relu)
-        hidden2 = tf.layers.dense(hidden1, n_hidden2, name="hidden2", activation=tf.nn.relu)
-        hidden3 = tf.layers.dense(hidden2, n_hidden3, name="hidden3", activation=tf.nn.relu)
-        out = tf.layers.dense(hidden3, n_outputs, name="outputs")
+        X_drop = tf.layers.dropout(X, keep_prob, training=True)
+        hidden1 = tf.layers.dense(X_drop, n_hidden1, name="hidden1", activation=tf.nn.relu)
+        h1_drop = tf.layers.dropout(hidden1, keep_prob, training=True)
+        hidden2 = tf.layers.dense(h1_drop, n_hidden2, name="hidden2", activation=tf.nn.relu)
+        h2_drop = tf.layers.dropout(hidden2, keep_prob, training=True)
+        hidden3 = tf.layers.dense(h2_drop, n_hidden3, name="hidden3", activation=tf.nn.relu)
+        h3_drop = tf.layers.dropout(hidden3, keep_prob, training=True)
+        out = tf.layers.dense(h3_drop, n_outputs, name="outputs")
 
     with tf.name_scope("loss"):
         kappa = 10
