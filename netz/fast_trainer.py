@@ -58,8 +58,10 @@ def get_data(series=['x', 'xr', 'xp']):
 def train(training_op, loss, X):
     Xc_train, Xc_test, Xr_train, Xr_test, Xp_train, Xp_test = get_data()
 
-    n_epochs = 40
-    batch_size = 50
+    n_epochs = 200
+    batch_size = 500
+    lowest_cost = float("inf")
+    lowest_cost_epoch = 0
     init = tf.global_variables_initializer()
 
     with tf.Session() as sess:
@@ -76,6 +78,11 @@ def train(training_op, loss, X):
             X_test = np.array([Xc_test, Xp_test, Xr_test])
             test_cost = sess.run(loss, feed_dict={X: X_test})
             print("Epoch: ", epoch, " Test Loss: ", test_cost)
+            if test_cost < lowest_cost:
+                lowest_cost = test_cost
+                lowest_cost_epoch = epoch
+            elif epoch - lowest_cost_epoch > 9:
+                break
 
         print("Dumping the model")
         weights = [v.eval(session=sess) for v in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if v.name.endswith('kernel:0')]
