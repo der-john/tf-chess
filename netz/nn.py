@@ -2,12 +2,12 @@ import tensorflow as tf
 
 def get_nn_for_training():
     n_inputs = 64*12
-    n_hidden1 = 4096
+    n_hidden1 = 2048
     n_hidden2 = 2048
-    n_hidden3 = 1024
+    n_hidden3 = 2048
     n_outputs = 1
 
-    beta = 0.01
+    beta = 0.001
     X = tf.placeholder(tf.float32, shape=(3, None, n_inputs), name="X")
 
     with tf.name_scope("dnn"):
