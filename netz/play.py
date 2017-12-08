@@ -13,6 +13,8 @@ import random
 import traceback
 from nn import *
 
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+
 def get_model_from_pickle(fn):
     f = open(fn, mode='rb')
     return pickle.load(f, encoding='latin1')
@@ -174,8 +176,6 @@ class Human(Player):
 
         return gn_new
 
-init = tf.global_variables_initializer()
-
 def game():
     gn_current = chess.pgn.Game()
     print(gn_current.board().turn)
@@ -186,6 +186,8 @@ def game():
     player_b = Human()
 
     times = {'A': 0.0, 'B': 0.0}
+
+    init = tf.global_variables_initializer()
 
     with tf.Session() as sess:
         init.run()
