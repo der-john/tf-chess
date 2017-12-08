@@ -38,7 +38,7 @@ def sf2array(pos, flip):
 
 CHECKMATE_SCORE = 1e6
 
-def negamax(sess, w, b, pos, depth, alpha, beta, color, count):
+def negamax(sess, cost, X, pos, depth, alpha, beta, color, count):
     moves = []
     boards = []
     pos_children = []
@@ -54,7 +54,7 @@ def negamax(sess, w, b, pos, depth, alpha, beta, color, count):
     #print(np.shape(boards))
     #input("Isn't this a board vector?")
     # Use model to predict scores
-    scores = use_nn_for_play(sess, w, b, boards)
+    scores = sess.run(cost, feed_dict={X: boards})
 
     for i, pos_child in enumerate(pos_children):
         if pos_child.board.find('K') == -1:
@@ -74,7 +74,7 @@ def negamax(sess, w, b, pos, depth, alpha, beta, color, count):
         else:
             # print 'ok will recurse', sunfish.render(move[0]) + sunfish.render(move[1])
             pos_child = pos.move(move)
-            neg_value, _, count_t = negamax(sess, w, b, pos_child, depth-1, -beta, -alpha, -color, count)
+            neg_value, _, count_t = negamax(sess, cost, X, pos_child, depth-1, -beta, -alpha, -color, count)
             value = -neg_value
         count2 = count2 + count_t
 
@@ -109,9 +109,7 @@ class Computer(Player):
     def __init__(self, maxd=5):
         self._pos = sunfish.Position(sunfish.initial, 0, (True,True), (True,True), 0, 0)
         self._maxd = maxd
-        weights, biases = get_model_from_pickle('model.tfc')
-        self._weights = weights
-        self._biases = biases
+        self._weights, self._biases = get_model_from_pickle('model_2017-12-01.tfc')
 
     def move(self, sess, gn_current):
         assert(gn_current.board().turn == True)
@@ -128,7 +126,8 @@ class Computer(Player):
 
         depth = self._maxd
         t0 = time.time()
-        best_value, best_move, count = negamax(sess, self._weights, self._biases, self._pos, depth, alpha, beta, 1, 0)
+        cost, X = get_nn_for_play(self._weights, self._biases)
+        best_value, best_move, count = negamax(sess, cost, X, self._pos, depth, alpha, beta, 1, 0)
         crdn = sunfish.render(best_move[0]) + sunfish.render(best_move[1])
         print(depth, best_value, crdn, time.time() - t0, count)
 
