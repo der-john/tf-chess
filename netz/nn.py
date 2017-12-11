@@ -46,7 +46,7 @@ def neuron_layer(X, W, b, name, activation=None):
         else:
             return Z
 
-def use_nn_for_play(sess, weights, biases, X_arg):
+def get_nn_for_play(weights, biases):
     W1, W2, W3, W4 = weights
     b1, b2, b3, b4 = biases
     X = tf.placeholder(tf.float32, shape=(None, 768), name="X")
@@ -55,4 +55,4 @@ def use_nn_for_play(sess, weights, biases, X_arg):
     Z2 = neuron_layer(Z1, W2, b2, name="hidden2", activation=tf.nn.relu)
     Z3 = neuron_layer(Z2, W3, b3, name="hidden3", activation=tf.nn.relu)
     out = neuron_layer(Z3, W4, b4, name="outputs")
-    return sess.run(out, feed_dict={X: X_arg})
+    return out, X
